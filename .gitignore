@@ -1,0 +1,17 @@
+# Node & Build artifacts
+node_modules/
+dist/
+build/
+.cache/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Scratch & Temporary
+*.tmp
+*.bak
+scratch/

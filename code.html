@@ -1,0 +1,2571 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>eFIX AUTO — Practical Embedded &amp; Hardware Engineering Solutions</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#059669",
+            "brand-green": "#10B981",
+            "brand-teal": "#00855D",
+            "brand-cyan": "#06B6D4",
+            "brand-blue": "#2563EB",
+            "brand-dark": "#0F172A",
+            "brand-slate": "#1E293B",
+            surface: "#FAFBFF",
+          },
+          fontFamily: {
+            sans: ["'Plus Jakarta Sans'", "sans-serif"],
+            display: ["'Space Grotesk'", "sans-serif"],
+            mono: ["'JetBrains Mono'", "monospace"],
+          },
+          boxShadow: {
+            'tech': '0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 8px -1px rgba(5, 150, 105, 0.08)',
+            'tech-hover': '0 12px 30px -4px rgba(37, 99, 235, 0.16), 0 6px 16px -2px rgba(16, 185, 129, 0.18)',
+            'glow-cyan': '0 0 25px rgba(6, 182, 212, 0.4)',
+          }
+        },
+      },
+    };
+  </script>
+<style>
+    .gradient-brand-text {
+      background: linear-gradient(135deg, #059669 0%, #00855D 35%, #0284C7 70%, #2563EB 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .circuit-dot-bg {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    @keyframes scanline {
+      0% { transform: translateY(0%); opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { transform: translateY(320px); opacity: 0.8; }
+    }
+    .animate-scanline {
+      animation: scanline 2.8s linear infinite alternate;
+    }
+    @keyframes pulse-pipeline {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    .pipeline-glow {
+      animation: pulse-pipeline 2.5s ease-in-out infinite;
+    }
+    /* Gear Intro Animation Styles */
+    @keyframes dockPulse {
+      0% { transform: scale(0.6); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.8; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .docking-ripple {
+      animation: dockPulse 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes logoAuraShimmer {
+      0%, 100% { filter: drop-shadow(0 0 0px rgba(6,182,212,0)); }
+      50% { filter: drop-shadow(0 0 8px rgba(6,182,212,0.6)) drop-shadow(0 0 16px rgba(37,99,235,0.4)); }
+    }
+    .logo-active-glow {
+      animation: logoAuraShimmer 2.4s ease-in-out infinite;
+    }
+    /* Card to Modal Transition & Engineering UI Styles */
+    .service-card-active {
+      transform: scale(1.04) !important;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    .modal-anim-enter {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-anim-enter-active {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+  </style>
+</head>
+<body class="bg-[#FAFBFF] text-slate-800 antialiased selection:bg-emerald-500 selection:text-white font-sans">
+<!-- TOP STATUS BAR -->
+<aside aria-label="System status" class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800 hidden md:block">
+<div class="max-w-7xl mx-auto flex justify-between items-center font-mono">
+<div class="flex items-center gap-4">
+<span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          LAB BENCH LIVE
+        </span>
+<span class="text-slate-600">|</span>
+
+<span class="text-slate-600">|</span>
+<span class="text-slate-300">CORE TEAM : Embedded GRADUATES</span>
+</div>
+<div class="flex items-center gap-6 text-slate-300">
+<span class="flex items-center gap-1.5 hover:text-emerald-400 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-emerald-400">verified</span>
+          DFM &amp; IPC-A-610 Compliant
+        </span>
+<a class="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 transition-colors" href="mailto:engineering@efixauto.com">
+<span class="material-symbols-outlined text-[15px]">mail</span>
+          engineeringatefixauto.com
+        </a>
+</div>
+</div>
+</aside>
+<!-- STICKY HEADER -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<!-- Logo -->
+<a id="headerLogoLink" class="flex items-center gap-3 group relative cursor-pointer" href="#" title="eFIX AUTO">
+<div id="headerLogoContainer" class="relative inline-flex items-center">
+<img id="headerLogoImg" alt="eFIX AUTO Logo" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP2-s818UsVc1u3Zcw_jW7-kaP7g3dWmsptKaiO_fJUYGN1Vymr-dKzWeFCc4-s3s2aHigPYOeqpv8AzVazUZtfF9QybCzUDwTQsYax0sTDaHxhihL52SNXSyvaq3TFet9xcR13WC_Pw0p2IEh0uY3jzflcic6i696iIxd4XjHUCZV8-EoMRHdhJYheHdpLXwl4GZV8gpDOvUHFGjW57qX-q8o0Tk-0v7ajWTmi2y_Xom38dmNzvn0_17U2i1oSUZXCUs">
+<!-- Docking Pulse Shockwave placeholder -->
+<div id="logoDockPulse" class="absolute pointer-events-none rounded-full border-2 border-cyan-400 opacity-0" style="width: 32px; height: 32px; top: 50%; right: 4px; transform: translate(50%, -50%);"></div>
+</div>
+<div class="hidden lg:flex flex-col ml-3 pl-3 border-l border-slate-300 leading-tight">
+<span class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Engineering Solutions</span>
+<span class="text-[9px] font-mono text-emerald-600 font-semibold">HARDWARE • AI • FIRMWARE</span>
+</div>
+</a>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-semibold text-slate-700">
+<a class="hover:text-emerald-600 transition-colors" href="#services">Our Services</a>
+<a class="hover:text-emerald-600 transition-colors" href="#focus">Our Focus</a>
+<a class="hover:text-emerald-600 transition-colors" href="#why-us">Why Choose Us</a>
+<a class="hover:text-cyan-600 transition-colors flex items-center gap-1" href="#flagship">
+<span class="material-symbols-outlined text-[16px] text-amber-500">stars</span>
+            Flagship
+          </a>
+<a class="hover:text-emerald-600 transition-colors" href="#projects">Our Projects</a>
+<a class="hover:text-emerald-600 transition-colors" href="#pipeline">How We Work</a>
+<a class="text-blue-600 font-bold hover:underline flex items-center gap-1" href="#learn">
+<span class="material-symbols-outlined text-[16px]">school</span>
+            Learn
+          </a>
+<a class="hover:text-emerald-600 transition-colors" href="#about">About</a>
+</nav>
+<!-- CTA Action -->
+<div class="flex items-center gap-3">
+<a class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-md hover:shadow-tech-hover transition-all transform active:scale-95" href="#contact">
+<span class="">Discuss Your Idea</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+<button aria-label="Toggle navigation menu" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" type="button">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</div>
+<!-- Mobile Menu -->
+<div class="hidden md:hidden py-4 border-t border-slate-200 space-y-2 bg-white" id="mobile-menu">
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#services">Our Services</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#focus">Our Focus</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#why-us">Why Choose Us</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-cyan-600" href="#flagship">Flagship Project</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#projects">Our Projects</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#pipeline">How We Work</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-blue-600" href="#learn">Learn With eFIX AUTO</a>
+<a class="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 hover:bg-slate-50" href="#about">About &amp; 8 ECE Team</a>
+<a class="block w-full text-center px-4 py-3 rounded-xl text-white bg-gradient-to-r from-emerald-600 to-blue-600 font-bold mt-3" href="#contact">Discuss Your Idea</a>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- 01 HERO SECTION -->
+<!-- ========================================================================= -->
+<section class="relative pt-10 pb-20 lg:pt-16 lg:pb-28 overflow-hidden circuit-dot-bg border-b border-slate-200" id="hero">
+<!-- Section Realistic Background with Bright Translucent Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden"><img alt="eFIX AUTO Hardware Innovation Showcase" class="w-full h-full object-cover object-center" style="opacity: 0.95;" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW2T1HnU2KAb78psi1vMtm3pXNx0TBDFTEF_c7UnG00RVDcb8gNqaKUIsIBvv1LvDJRwijSQH4S_Jn15QzdQyJtRZxC0tDMzfpABBEJCJIHTELg-PcQAUntkNsxjGS4wUYjRUvx5y7Lt8TqDSerLaRnTDce8QGyPd_h9KT7hl7tRaKezfA2YNnTu5SF48LWQKR9PrnLRTotoU9j-_qFOH9v57qfhpItSzCMMO_P6F75fJNzIJO-4FeWGuYusU2wZXEQ6o"><div class="absolute inset-0 bg-gradient-to-r from-white/70 via-white/40 to-transparent pointer-events-none"></div></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-8 space-y-6 bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-3xl border border-white/60 shadow-sm">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 font-mono text-xs font-bold text-emerald-800 tracking-wide">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            ENGINEERING IDEAS INTO REAL SOLUTIONS
+          </div>
+<h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+            Turning Real-World Problems into <span class="gradient-brand-text">Engineering Solutions.</span>
+</h1>
+<p class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+<span class="material-symbols-outlined text-teal-600 text-2xl">memory</span>
+            Where Electronics Meets Intelligence.
+          </p>
+<p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
+            eFIX AUTO combines electronics, embedded systems, AI, IoT, PCB design, and automation to transform ideas and real-world problems into practical working solutions.
+          </p>
+<div class="pt-2 flex flex-wrap items-center gap-4">
+<a class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-tech hover:shadow-tech-hover transition-all transform active:scale-95 text-base" href="#contact">
+<span class="">Discuss Your Idea</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+<a class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-slate-800 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all text-base shadow-sm" href="#projects">
+<span class="material-symbols-outlined text-emerald-600">deployed_code</span>
+<span class="">Explore Our Work</span>
+</a>
+</div>
+</div>
+<div class="lg:col-span-4 relative">
+<!-- Glass Spec Card with Core Metrics -->
+
+</div>
+</div>
+<!-- Visual Story Banner: PCB -> MCU -> AI -> Automation -> Working Prototype -->
+<div class="mt-14 pt-8 border-t border-slate-200">
+<div class="text-xs uppercase tracking-widest font-mono text-slate-500 font-bold mb-4 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+<span class="material-symbols-outlined text-base text-emerald-600">account_tree</span>
+          CONTINUOUS PROTOTYPING PIPELINE: FROM SILICON TO WORKING DEPLOYMENT
+        </div>
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-3 font-mono text-xs font-semibold">
+<div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center gap-2 text-slate-800">
+<span class="w-6 h-6 rounded bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px]">01</span>
+<span class="">PCB &amp; Hardware</span>
+</div>
+<div class="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-sm flex items-center gap-2 text-emerald-800">
+<span class="w-6 h-6 rounded bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px]">02</span>
+<span class="">MCU Firmware</span>
+</div>
+<div class="p-3.5 rounded-xl bg-white border border-teal-200 shadow-sm flex items-center gap-2 text-teal-800">
+<span class="w-6 h-6 rounded bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-[11px]">03</span>
+<span class="">AI &amp; Vision</span>
+</div>
+<div class="p-3.5 rounded-xl bg-white border border-cyan-200 shadow-sm flex items-center gap-2 text-cyan-800">
+<span class="w-6 h-6 rounded bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-[11px]">04</span>
+<span class="">Automation</span>
+</div>
+<div class="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-emerald-600 text-white shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-700 text-white flex items-center justify-center font-bold text-[11px]">05</span>
+<span class="">Prototype</span>
+</div>
+<span class="material-symbols-outlined text-base">verified</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 02 OUR SERVICES SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 border-b border-slate-200 relative bg-[#F8FAFC]" id="services">
+<!-- Distinct Background Image + Translucent Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="High-resolution PCB inspection setup" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1Xe0xo2NFZblZzaoDhCoGimThxDUrBcqU8XX2j3IA2j4PJ_0z0zMfCfPnX8EENavRs9Ai1q8tEn6MHv_MYgME99E3uA7WcR7-CcfG51SSdhSGGfPVhFQPqRWyJUjr6WWR6REnUA_AS4Io1u4tL9ZeTmgN9U8EI7RV5JohYadNEXHUG0waEgY8jDbvI7fj0_hZySaaoF1U9hfey_-0pJ1N7Y16r-AnBk5R0V1nhXCCij705N_osWp5spqvI">
+<div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/85 to-[#F8FAFC]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 mb-3 border border-emerald-200"><span class="material-symbols-outlined text-[15px]">precision_manufacturing</span> Core Engineering Scenarios</div>
+<h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          End-to-End Engineering Solutions
+        </h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          From concept to working prototype, we develop practical solutions across embedded systems, electronics, AI, PCB design, IoT, and automation.
+        </p>
+</div>
+<!-- Exactly 8 Services with Exact Content & Technology Pills -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+<!-- 1. Embedded Systems & Firmware Engineering -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-emerald-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('embedded', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80" alt="Embedded Systems &amp; Firmware Engineering" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-emerald-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">developer_board</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-emerald-600 transition-colors">Embedded Systems &amp; Firmware Engineering</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Design and development of reliable embedded firmware for microcontrollers, connected devices, sensors, and real-time applications.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Bare-Metal</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">STM32 / ARM</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">ESP32</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">RTOS</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Electronics Engineering -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('electronics', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80" alt="Electronics Engineering" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-teal-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">electric_bolt</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-teal-600 transition-colors">Electronics Engineering</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Practical analog and digital electronics engineering from circuit concepts to tested hardware.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Analog/Digital</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Oscilloscope</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Power Stages</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Sensors</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. PCB Design & Hardware Development -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('pcb', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="https://images.unsplash.com/photo-1517055729445-fa7d27394b48?auto=format&fit=crop&w=800&q=80" alt="PCB Design &amp; Hardware Development" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-blue-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">memory</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">PCB Design &amp; Hardware Development</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Production-oriented PCB design from schematic capture through layout, fabrication, and validation.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">KiCad</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Altium</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Multi-Layer</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">DFM / DFA</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. AI & Computer Vision (Flagship Highlight) -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-emerald-500 shadow-xl shadow-glow-cyan transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer relative ring-2 ring-emerald-400/20" onclick="openScenarioModal('aivision', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369870039.jpg" alt="AI &amp; Computer Vision" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent"></div>
+    <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-emerald-600 text-white font-mono text-[10px] font-bold tracking-wide shadow-md flex items-center gap-1">
+      <span class="">★ FLAGSHIP CAPABILITY</span>
+    </div>
+    <div class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-slate-900/90 text-cyan-400 flex items-center justify-center border border-cyan-500 shadow-sm">
+      <span class="material-symbols-outlined text-lg">visibility</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between bg-gradient-to-b from-white to-emerald-50/20">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 flex items-center gap-1.5 group-hover:text-emerald-600 transition-colors">
+        AI &amp; Computer Vision
+      </h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Edge AI and computer-vision solutions for inspection, detection, classification, and intelligent automation.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">NVIDIA Jetson</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 font-bold">OpenCV</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">TensorFlow</span>
+      </div>
+      <div class="pt-2 border-t border-emerald-200/80 flex items-center justify-between text-xs font-bold text-emerald-700">
+        <span class="">Launch Interactive Spec</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">open_in_new</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. IoT & Connected Systems -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('iot', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369907477.jpg" alt="IoT &amp; Connected Systems" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-teal-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">cell_tower</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-teal-600 transition-colors">IoT &amp; Connected Systems</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Connected embedded systems that collect, communicate, monitor, and visualize real-world data.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">ESP32 IoT</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Wi-Fi / BLE</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">MQTT / API</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Telemetry</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Automation & Control Systems -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-emerald-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('automation', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369870055.jpg" alt="Automation &amp; Control Systems" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-emerald-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">smart_toy</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-emerald-600 transition-colors">Automation &amp; Control Systems</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Embedded control and automation solutions that connect sensors, controllers, actuators, and machines.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Motor Control</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Relay Stages</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">State Machines</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">PID Loops</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Rapid Prototyping & Product Development -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('prototyping', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=800&q=80" alt="Rapid Prototyping &amp; Product Development" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-blue-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">build_circle</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">Rapid Prototyping &amp; Product Development</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Move engineering ideas quickly from concept to functional prototype.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">PoC Bring-Up</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Breadboard to PCB</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Engineering BOM</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. Engineering Guidance & Student Projects -->
+<div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 hover:border-cyan-500 hover:shadow-tech transition-all duration-300 flex flex-col justify-between group overflow-hidden cursor-pointer" onclick="openScenarioModal('guidance', this)">
+  <div class="h-40 relative overflow-hidden bg-slate-900">
+    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Engineering Guidance &amp; Student Projects" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+    <div class="absolute top-3 right-3 w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm text-cyan-400 flex items-center justify-center border border-slate-700 shadow-md">
+      <span class="material-symbols-outlined text-lg">school</span>
+    </div>
+  </div>
+  <div class="p-5 flex-1 flex flex-col justify-between">
+    <div>
+      <h3 class="text-base font-bold text-slate-900 mb-1.5 group-hover:text-cyan-600 transition-colors">Engineering Guidance &amp; Student Projects</h3>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">
+        Practical engineering guidance for students, innovators, and early-stage project teams.
+      </p>
+    </div>
+    <div>
+      <div class="flex flex-wrap gap-1 font-mono text-[10px] mb-3">
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Final-Year ECE</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Live Probing Lab</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">Viva / Demo Prep</span>
+        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">VLSI Path</span>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-cyan-600">
+        <span class="">View Complete Architecture</span>
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 03 OUR FOCUS SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-white border-b border-slate-200 relative" id="focus">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Industrial automation and robotics environment" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlM-7TXzISSywi-_59jHAIEmD5xuK963-wM53E7TYSIP-c5cr_p3a_jHfd5noKwgNSzhUtAChFLR3CBlU2jIWo_3PF00e7lUN_QrUqIOOTCeSA0BDo-4-DLgrk3j8Vyd5Tjhu4kZvVztdlQH--Vlw6lkIE0sVV0ad5xIxpNJQ8XA2uIK3Oas9YdVRjBrAvznX236aT18qGSMtbJkOZfHAycZGQfIbSuUBGLmOxwyDY3e15Xwjq9S7PFdCmUqO6de1G5cQ">
+<div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="max-w-3xl mb-14">
+<span class="text-xs font-mono font-bold uppercase tracking-wider text-teal-800 bg-teal-100 px-3 py-1 rounded-full border border-teal-200">
+          Our Focus
+        </span>
+<h2 class="text-3xl sm:text-4xl font-black tracking-tight mt-3 text-slate-900">
+          Real Problems. Practical Engineering.
+        </h2>
+<p class="mt-3 text-base sm:text-lg text-slate-600">
+          We focus on engineering challenges where electronics, embedded systems, AI, and automation can create measurable real-world impact.
+        </p>
+</div>
+<!-- 4 Focus Areas: Automation, Industrial Problems, Embedded Systems, Resource Efficiency -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- 1. Automation -->
+<div class="p-6 rounded-2xl bg-slate-50/90 border border-slate-200 relative overflow-hidden group hover:border-emerald-500 hover:shadow-tech transition-all">
+<div class="absolute -right-4 -bottom-4 text-slate-200 text-7xl font-black select-none pointer-events-none">01</div>
+<div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold mb-4 shadow-sm">
+<span class="material-symbols-outlined text-xl">precision_manufacturing</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 mb-2">Automation</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Eliminating repetitive manual bottlenecks, lowering human error rates, and constructing deterministic electromechanical control systems.
+          </p>
+</div>
+<!-- 2. Industrial Problems -->
+<div class="p-6 rounded-2xl bg-slate-50/90 border border-slate-200 relative overflow-hidden group hover:border-teal-500 hover:shadow-tech transition-all">
+<div class="absolute -right-4 -bottom-4 text-slate-200 text-7xl font-black select-none pointer-events-none">02</div>
+<div class="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold mb-4 shadow-sm">
+<span class="material-symbols-outlined text-xl">factory</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 mb-2">Industrial Problems</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Upgrading legacy production cells, manual quality bottlenecks, machinery telemetry, and shop-floor yield without expensive overhaul.
+          </p>
+</div>
+<!-- 3. Embedded Systems -->
+<div class="p-6 rounded-2xl bg-slate-50/90 border border-slate-200 relative overflow-hidden group hover:border-blue-500 hover:shadow-tech transition-all">
+<div class="absolute -right-4 -bottom-4 text-slate-200 text-7xl font-black select-none pointer-events-none">03</div>
+<div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold mb-4 shadow-sm">
+<span class="material-symbols-outlined text-xl">memory</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 mb-2">Embedded Systems</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Engineering robust custom microcontroller hardware, noise-tolerant firmware, real-time sensor processing, and edge computing units.
+          </p>
+</div>
+<!-- 4. Resource Efficiency -->
+<div class="p-6 rounded-2xl bg-slate-50/90 border border-slate-200 relative overflow-hidden group hover:border-cyan-500 hover:shadow-tech transition-all">
+<div class="absolute -right-4 -bottom-4 text-slate-200 text-7xl font-black select-none pointer-events-none">04</div>
+<div class="w-11 h-11 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-bold mb-4 shadow-sm">
+<span class="material-symbols-outlined text-xl">eco</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 mb-2">Resource Efficiency</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Minimizing component scrap, optimizing energy consumption in IoT nodes, and delivering high accuracy in closed-loop cycles.
+          </p>
+</div>
+</div>
+<!-- Prominent Quote Card -->
+<div class="mt-12 p-8 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-l-4 border-l-emerald-600 border border-emerald-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-4xl text-emerald-600">format_quote</span>
+<p class="text-xl sm:text-2xl font-bold text-slate-900 italic tracking-tight">
+            “Every problem is an opportunity to engineer something better.”
+          </p>
+</div>
+<div class="shrink-0 font-mono text-xs uppercase font-bold text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+          eFIX AUTO Core Motto
+        </div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 04 WHY CHOOSE US SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-[#F8FAFC] border-b border-slate-200 relative" id="why-us">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Hardware lab and developers working on embedded systems" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1U6uZAezM7d9f2wPHnHk7c3-jax6X_J1zxreb5l3XRGvZ7OSDtHgKJnTAaWQ_hHIGX4j9zMgDqtgHo3fxluq-Uc_DYsbC11nHtF2oA0sn0nBS4Wdtc-G-UDz-5NM0fQzQdDLFBTrg-xwTguI2kQInhb_Lrfrwp63-xQBjyC4Pk5cu6av_7ZCXmbjbzmM064NYloZT5s82Vw8-100wQqWsgMOvBIEdS2DQ_4MFkEnQGXoObj8_-tp7RA6_M">
+<div class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/95 via-[#F8FAFC]/85 to-[#F8FAFC]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-blue-800 bg-blue-100 mb-3 border border-blue-200">
+<span class="material-symbols-outlined text-[15px]">verified_user</span>
+          Why Choose eFIX AUTO?
+        </div>
+<h2 class="text-3xl sm:text-4xl font-black tracking-tight gradient-brand-text">
+          Practical. Technical. Future-Focused.
+        </h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          We combine hands-on engineering experience with a problem-solving mindset to develop practical solutions for real-world needs.
+        </p>
+</div>
+<!-- Exactly 8 Values/Differentiators -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- 1. Hands-On Experience -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">01</span>
+<span class="material-symbols-outlined text-emerald-600">hardware</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Hands-On Experience</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Built through extensive practical bench work, direct oscilloscope probing, firmware flashing, and hardware troubleshooting.
+          </p>
+</div>
+<!-- 2. Multi-Disciplinary Engineering -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">02</span>
+<span class="material-symbols-outlined text-teal-600">hub</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Multi-Disciplinary Engineering</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Cohesive synthesis of electronics, embedded firmware, edge AI computer vision, IoT networks, and mechanical actuators.
+          </p>
+</div>
+<!-- 3. Real-World Problem Solving -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">03</span>
+<span class="material-symbols-outlined text-blue-600">psychology</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Real-World Problem Solving</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Focusing directly on concrete industrial bottlenecks, avoiding over-engineering, and delivering measurable operational impact.
+          </p>
+</div>
+<!-- 4. Custom Solutions -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-cyan-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">04</span>
+<span class="material-symbols-outlined text-cyan-600">tune</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Custom Solutions</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Tailored hardware schematics and custom firmware written specifically to fit your exact footprint, power, and I/O specifications.
+          </p>
+</div>
+<!-- 5. Prototype-First Approach -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">05</span>
+<span class="material-symbols-outlined text-emerald-600">biotech</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Prototype-First Approach</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Rapid tangible proof-of-concepts proven in real bench environments before incurring large manufacturing or assembly costs.
+          </p>
+</div>
+<!-- 6. Continuous Learning -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">06</span>
+<span class="material-symbols-outlined text-teal-600">auto_stories</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Continuous Learning</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Consistently updating our skill matrix with cutting-edge microcontrollers, AI vision architectures, and modern CAD paradigms.
+          </p>
+</div>
+<!-- 7. Customer Focus -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">07</span>
+<span class="material-symbols-outlined text-blue-600">support_agent</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Customer Focus</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Transparent communication, iterative updates, open schematic reviews, and dedicated post-delivery technical walkthroughs.
+          </p>
+</div>
+<!-- 8. Future-Focused -->
+<div class="bg-white/95 p-6 rounded-2xl border border-slate-200 hover:border-cyan-500 hover:shadow-tech transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">08</span>
+<span class="material-symbols-outlined text-cyan-600">rocket_launch</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 mb-2">Future-Focused</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Designing modular, upgradeable architectures prepared for scale, edge inference integration, and long industrial lifecycles.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 05 FEATURED FLAGSHIP PROJECT -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-white border-b border-slate-200 relative" id="flagship">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="NVIDIA Jetson inspection rig &amp; industrial camera setup" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1UkpaYTJLd6n9WEpG9dhRB2iLjCLDsVkLtldZQ1pBiYF4FTtMF21uPHA_7AMlAcb7uAO0IoidOq8G1l3GjpY_pcT1Ad0BS0Aa7KMst_O9Y7iU32KjgwkguEDhwvX4QTGSz2ykdvbxsWIBELLp4BvtjgdfpfRwdRUWlm7mumrtEuJzUa7IaHaEtdumYkudP5N12g5rbgm5O7Zkymd20wwJfqzuGTb1EhrxOCWbOG50XIdwahAGe0bujioKS8">
+<div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/85 to-white"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-50 text-amber-800 border border-amber-300">
+<span class="">🏆</span> OUR FLAGSHIP PROJECT // FEATURED PROJECT
+          </div>
+<h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-2">
+            AI-Based PCB Defect Inspection System
+          </h2>
+</div>
+<div class="font-mono text-xs text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
+          PROD VER: 2.4-STABLE // JETSON-ORIN-EDGE
+        </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+<!-- Details & Tech Specs -->
+<div class="lg:col-span-6 space-y-6">
+<p class="text-base sm:text-lg text-slate-700 leading-relaxed">
+            An AI-based computer vision system designed to automatically inspect PCBs and detect defects. It scans surface-mount assemblies on fast conveyor lines, detecting solder bridges, missing passive components, and incorrect polarity in real time.
+          </p>
+<div>
+<span class="text-xs uppercase font-mono font-bold text-slate-500 block mb-2">Integrated Technology Stack</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                NVIDIA Jetson Orin
+              </span>
+<span class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                Computer Vision (OpenCV)
+              </span>
+<span class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">
+                AI &amp; Deep Learning CNN
+              </span>
+<span class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                PCB Inspection Optical Rig
+              </span>
+</div>
+</div>
+<div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 font-mono text-xs space-y-3 shadow-sm">
+<div class="flex justify-between items-center pb-2 border-b border-slate-200">
+<span class="text-slate-500">Processing Latency:</span>
+<span class="font-bold text-emerald-600">18 ms / Frame (55 FPS)</span>
+</div>
+<div class="flex justify-between items-center pb-2 border-b border-slate-200">
+<span class="text-slate-500">Optical Telecentric Rig:</span>
+<span class="font-bold text-slate-800">High-Resolution Industrial GigE</span>
+</div>
+<div class="flex justify-between items-center pb-2 border-b border-slate-200">
+<span class="text-slate-500">Edge Compute Platform:</span>
+<span class="font-bold text-blue-600">NVIDIA Jetson Orin Nano / Xavier</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-slate-500">Defect Detection Scope:</span>
+<span class="font-bold text-slate-800">Solder Bridging • Missing Components • Misalignment</span>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-4 pt-2">
+<a class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-slate-900 hover:bg-slate-800 shadow-md transition-all text-sm" href="#contact">
+<span class="material-symbols-outlined text-base">analytics</span>
+<span class="">Discuss Your Inspection Needs</span>
+</a>
+<a class="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-slate-800 border border-slate-300 hover:bg-slate-50 transition-all text-sm" href="#projects">
+<span class="">View Full Project</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Realistic Inspection Monitor Visual with HUD & Bounding Boxes -->
+<div class="lg:col-span-6 relative">
+<div class="relative rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl bg-slate-950">
+<!-- Feed Image -->
+<img alt="Realistic PCB Inspection Setup" class="w-full h-80 sm:h-96 object-cover opacity-85" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe-CzCj5h9C06yu3A6PVoM68ny_3-ZlUuDTob6SbIazMzytXB1Ir5imTYoOgxwG8fePoRtLtW_Zuab-qll6NC8UkgpcIeLLk9ejdk979Cc60JLTpYXiBTOgV4kJIOQ1PREoA1amNUus2qzvptMkNQRpWfszIXrirUa-cr_4D4qrIAEwENlfsVYeiiaJcaQolywHTnzIY4wKvRYrRc0kWScd55g7kH2QBRMBDezEVSvS2LlUIwyTfa5naId-VR9rR8XC6MgjCqeKpicS5s">
+<!-- Active Laser Scanline -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-glow-cyan animate-scanline pointer-events-none"></div>
+<!-- Inspection HUD Overlay (Realistic Good/Defect Boxes, NO Fake Percentages) -->
+<div class="absolute inset-0 pointer-events-none p-5 flex flex-col justify-between">
+<div class="flex justify-between items-center bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700 text-[11px] font-mono text-emerald-400">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  LIVE INSPECTION FEED // FOV: 100mm x 75mm
+                </span>
+<span class="text-slate-300">EDGE JETSON INFERENCE</span>
+</div>
+<!-- Bounding Box HUD Area -->
+<div class="relative h-44 w-full">
+<!-- Defect Box -->
+<div class="absolute top-4 left-6 sm:left-14 border-2 border-rose-500 bg-rose-500/10 rounded px-2 py-1 shadow-lg">
+<div class="text-[10px] font-mono font-bold text-rose-300 bg-rose-950/90 px-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">warning</span>
+                    DEFECT: SOLDER BRIDGING
+                  </div>
+<div class="text-[9px] font-mono text-rose-200">IC_PIN_14_15 // FLAG REJECT</div>
+</div>
+<!-- Good Pass Box -->
+<div class="absolute bottom-4 right-6 sm:right-16 border-2 border-emerald-500 bg-emerald-500/10 rounded px-2 py-1 shadow-lg">
+<div class="text-[10px] font-mono font-bold text-emerald-300 bg-emerald-950/90 px-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+                    GOOD: IC ORIENTATION PASS
+                  </div>
+<div class="text-[9px] font-mono text-emerald-200">POLARITY CHECK: VERIFIED</div>
+</div>
+</div>
+<div class="bg-slate-950/90 backdrop-blur-md p-2.5 rounded-lg border border-slate-800 text-[10px] font-mono text-slate-300 flex justify-between items-center">
+<span class="">INSPECTED: 2,450 UNITS</span>
+<span class="text-emerald-400 font-bold">STATUS: STREAM ACTIVE</span>
+<span class="text-cyan-400 font-bold">INFERENCE: 18ms</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 06 OUR PROJECTS SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-[#F8FAFC] border-b border-slate-200 relative" id="projects">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Multi-prototype engineering laboratory bench" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3AQ9yiqJ8DrpOQCWcHxaFTNo1D76xQRLCWzRvylhyajVRkIUQRffft117w_TiWmwxa00HGpilUIe1uW7Jsr77jedVIhfWYIDo_sSnVAFgQ-bq-lfc-hExWRdQqVhKWwzLSF2GOjARIMpRsEfpyqeerohzbxL12i1x_JdO62JmT9x0JAXvkN44DztDU85WMrPKcVAznm9NZvtAyzsx7g7eYt8nupmU2cHHkGL3GvJrd-fKYd22dqDX7rqbY0PiPfRuI4I">
+<div class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/95 via-[#F8FAFC]/85 to-[#F8FAFC]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="text-center max-w-3xl mx-auto mb-14">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 mb-3 border border-emerald-200">
+<span class="material-symbols-outlined text-[15px]">deployed_code</span>
+          Our Projects
+        </div>
+<h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          Built Through Hands-On Engineering
+        </h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          Explore our practical projects across embedded systems, AI, computer vision, electronics, and automation.
+        </p>
+</div>
+<!-- 6 Practical Projects -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Project 1: AI-Based PCB Defect Inspection -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div>
+<div class="relative h-48 bg-slate-900 overflow-hidden">
+<img alt="AI-Based PCB Defect Inspection" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBheSJxQhfzI2qAStlMQ8MIcOAG7aH935HGnASAfopGR2z1eOIOSBMdhYv2-S87kxdBEzJpJ8TR6XaKIIdRdFcTTs8cIGBz602riM_vaNm9T08M8gOxSmjm8DAKh7KDPX4MSU1OyvhkZnifztKyZMTXssPmpH3bmVk3fv9IunOvzDqmcQXVFG950qvdbDYizG5HSTIhpPnX1043rq0RaCc-Jge9csjaZQZMVWJnONjd2_NxAPbZ4xFgWb29avjssmNOgHRlIUOjYUC_Y-A">
+<span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">
+                AI &amp; Computer Vision
+              </span>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">AI-Based PCB Defect Inspection</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Automated optical inspection system scanning PCB tracks for bridges, missing passive parts, and cold solder joints in real time.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">NVIDIA Jetson</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">OpenCV</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">CNN</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-emerald-600 font-mono font-bold">Ready for Deployment</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+<!-- Project 2: AI-Based Lip Reading Device -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div><div class="relative h-48 bg-slate-900 overflow-hidden"><img alt="AI-Based Lip Reading Device Prototype" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa53Yci604AV1c7HiaDidl912kfrepoMoaZqU9d-iFPpIp-jSFygkDO9JfM8pLwdZz2JDvVhU73YQ6NnzqrFtIByuzF7tDZGJVqehfEzg-YC2Gsfv9lEPXOBXLNjVGdeJD1t0_8BiVsYnG_nbYWFkLZW8zfkm9jeuoLj7LDmvJ5GSkeUTn1feaP7WOBCyL2sTZa2kjnmE1PSR81mS7gz8JnY2A-Hr1CuiXVGcavuCYK6ZCAZfiJUS2NqDDfcoH1jgr6yM"><span class="absolute top-3 left-3 bg-teal-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">Assistive AI</span></div>
+
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">AI-Based Lip Reading Device</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Compact wearable assistive camera for non-verbal individuals, translating facial and lip articulation into synthetic speech tokens.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">AI + CNN</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">ESP32-S3 Cam</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">I2S Audio</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-teal-600 font-mono font-bold">Functional PoC Verified</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+<!-- Project 3: Obstacle-Avoiding Robot -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div>
+<div class="relative h-48 bg-slate-900 overflow-hidden">
+<img alt="Obstacle-Avoiding Robot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC38PyWnC7ZNfwpAAZSLzm0kDt5BXTjld29r3odskT4uS5BgWs8c6taXOCrmEjzFTJ-vC_hDjsbQumhHiEGNRqv7TX71qeuB9YDfodehHU-C-i8Rnx81Ei-xPc6F0FKf0c1w5FztcS0AsKJOX8naib16NczrAiF0tl0ZsxVtAtQMWXY8U0hybJHZFiewAs3jYYg8GIaw5J2YXX1EJysuFannrjPtwHLkOly1Q7AZkrgF9ixmdftw8wM19FulJn6uPhOLUKpA8Yyk0SvTlQ">
+<span class="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">
+                Embedded &amp; Robotics
+              </span>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">Obstacle-Avoiding Robot</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Autonomous mobile transport rover equipped with ultrasonic sensors, LiDAR ranging, and closed-loop motor drivers.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Embedded Systems</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Sensors</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Automation</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-blue-600 font-mono font-bold">Lab Bench Validated</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+<!-- Project 4: LoRa Multi-Node Telemetry System -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div>
+<div class="relative h-48 bg-gradient-to-br from-emerald-950 to-slate-900 flex items-center justify-center p-6 text-center text-white">
+<div class="space-y-1">
+<span class="material-symbols-outlined text-4xl text-emerald-400">satellite_alt</span>
+<div class="font-mono text-xs font-bold text-emerald-200">LONG-RANGE TELEMETRY MESH</div>
+<div class="text-[10px] text-emerald-300/80">Low-Power Industrial RF</div>
+</div>
+<span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">
+                IoT &amp; Wireless
+              </span>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">LoRa Multi-Node Telemetry</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Sub-GHz long-range sensor telemetry network transmitting temperature, vibration, and gas readings over 5km distance.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">SX1276 LoRa</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">ESP32 DeepSleep</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">MQTT Sync</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-emerald-600 font-mono font-bold">Field Tested Mesh</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+<!-- Project 5: Automated Fluid Dispenser & Level Loop -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div>
+<div class="relative h-48 bg-gradient-to-br from-cyan-950 to-slate-900 flex items-center justify-center p-6 text-center text-white">
+<div class="space-y-1">
+<span class="material-symbols-outlined text-4xl text-cyan-400">valve</span>
+<div class="font-mono text-xs font-bold text-cyan-200">CLOSED-LOOP DOSING CONTROL</div>
+<div class="text-[10px] text-cyan-300/80">High-Precision Valve Rigs</div>
+</div>
+<span class="absolute top-3 left-3 bg-cyan-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">
+                Industrial Automation
+              </span>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">Automated Fluid Dispenser</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Automated precision liquid metering integrating Hall-effect flow sensors, opto-isolated solenoid switches, and safety cutoffs.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Flow Meter</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Opto-Isolation</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Solenoid Relay</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-cyan-600 font-mono font-bold">Factory Bench Operational</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+<!-- Project 6: SMD Reel High-Speed Part Counter -->
+<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-tech transition-all flex flex-col justify-between group">
+<div>
+<div class="relative h-48 bg-slate-900 overflow-hidden">
+<img alt="SMD Reel High-Speed Part Counter" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB7OlAfvUdSJjNaVead2mpcnUE2oH8KKLSskbWYjFnC9dU3U-Don-prcciv1wsym0FsHlCisq-VVErtoXjl0BoV9QPZidjPxqPMVLL4q6ZQjhI8daCjVPHEguSpqj-skP2Vdr19d4zu0XvJARNDFfdgFl60ha8J8XujeB2cYd-CySNSbpk488ZW67Wlo7HU32u-rtSB_VYmn0pYpnDctFVsLJxP2qnF-zed2qybVUUL0KDx7RVbyF5CE6eruJjOapoZxU">
+<span class="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-mono uppercase font-bold px-2.5 py-1 rounded-md">
+                Optical Hardware
+              </span>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-bold text-slate-900 mb-2">SMD Reel High-Speed Counter</h3>
+<p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                Fast infrared optical reel counter with stepper motor feed for rapid 0402 and 0603 passive component inventory counting.
+              </p>
+<div class="flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">IR Gate Trigger</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Micro-Stepper</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">OpenCV Verify</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0 border-t border-slate-100 flex justify-between items-center text-xs">
+<span class="text-blue-600 font-mono font-bold">Inventory Rig Validated</span>
+<span class="material-symbols-outlined text-slate-400 text-base">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 07 HOW WE WORK SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-white border-b border-slate-200 relative" id="pipeline">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Engineering design &amp; signal measurement bench" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1U6uZAezM7d9f2wPHnHk7c3-jax6X_J1zxreb5l3XRGvZ7OSDtHgKJnTAaWQ_hHIGX4j9zMgDqtgHo3fxluq-Uc_DYsbC11nHtF2oA0sn0nBS4Wdtc-G-UDz-5NM0fQzQdDLFBTrg-xwTguI2kQInhb_Lrfrwp63-xQBjyC4Pk5cu6av_7ZCXmbjbzmM064NYloZT5s82Vw8-100wQqWsgMOvBIEdS2DQ_4MFkEnQGXoObj8_-tp7RA6_M">
+<div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-teal-800 bg-teal-100 mb-3 border border-teal-200">
+<span class="material-symbols-outlined text-[15px]">linear_scale</span>
+          How We Work
+        </div>
+<h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          From Problem to Working Solution.
+        </h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          We follow a rigorous 7-stage engineering methodology ensuring requirements are understood, circuits are validated, and deliverable prototypes are field-ready.
+        </p>
+</div>
+<!-- Exactly 7 Official Steps in Order with Green-to-Blue Connecting Pipeline -->
+<div class="relative">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 relative z-10 items-stretch">
+<!-- STEP 01 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-emerald-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-emerald-600">
+<span class="font-mono font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">STEP 01</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Understand the Problem</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Requirement capture, identifying manual bottlenecks and operational constraints.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-emerald-700 font-bold">
+              SITE &amp; SCOPE
+            </div>
+</div>
+<!-- STEP 02 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-emerald-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-emerald-600">
+<span class="font-mono font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">STEP 02</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Discuss Idea &amp; Requirements</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Silicon feasibility, BOM cost estimation, protocol choice, and milestones.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-emerald-700 font-bold">
+              FEASIBILITY &amp; BOM
+            </div>
+</div>
+<!-- STEP 03 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-teal-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-teal-600">
+<span class="font-mono font-bold text-xs bg-teal-50 px-2 py-0.5 rounded border border-teal-200">STEP 03</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Propose a Technical Solution</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                System block diagrams, MCU &amp; sensor pinouts, and power supply budgets.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-teal-700 font-bold">
+              ARCHITECTURE
+            </div>
+</div>
+<!-- STEP 04 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-teal-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-teal-600">
+<span class="font-mono font-bold text-xs bg-teal-50 px-2 py-0.5 rounded border border-teal-200">STEP 04</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Design &amp; Develop</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Firmware coding in Embedded C, register setup, PCB routing in KiCad/Altium.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-teal-700 font-bold">
+              FIRMWARE &amp; CAD
+            </div>
+</div>
+<!-- STEP 05 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-blue-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-blue-600">
+<span class="font-mono font-bold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-200">STEP 05</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Build Prototype</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Breadboard check, quick-turn PCB fabrication, SMD assembly, and physical rig.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-blue-700 font-bold">
+              PCB FAB &amp; SOLDERING
+            </div>
+</div>
+<!-- STEP 06 -->
+<div class="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-blue-500 transition-colors">
+<div>
+<div class="flex items-center justify-between mb-3 text-blue-600">
+<span class="font-mono font-bold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-200">STEP 06</span>
+<span class="material-symbols-outlined text-base text-slate-400">arrow_forward</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Test &amp; Debug</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Oscilloscope signal analysis, power stability, thermal checks, stress runs.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] font-mono text-blue-700 font-bold">
+              BENCH VALIDATION
+            </div>
+</div>
+<!-- STEP 07 -->
+<div class="bg-white/95 p-4 rounded-2xl border-2 border-emerald-500 shadow-tech flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3 text-emerald-600">
+<span class="font-mono font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300">STEP 07</span>
+<span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
+</div>
+<h3 class="font-bold text-sm text-slate-900 mb-1">Deliver / Demonstrate</h3>
+<p class="text-xs text-slate-600 leading-relaxed">
+                Live working demonstration, documentation handover, firmware code &amp; schematics.
+              </p>
+</div>
+<div class="mt-3 pt-2 border-t border-emerald-200 text-[10px] font-mono text-emerald-700 font-bold">
+              FINAL HANDOVER
+            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 08 LEARN WITH eFIX AUTO SECTION (With Interactive Oscilloscope Simulator) -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-[#F8FAFC] border-b border-slate-200 relative" id="learn">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Authentic electronics lab environment" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1Xz4SwAhm5KvA0mPKDoG-De5F0spOVKVGnSWv4Ef9DSiC2_bREKQrJhydrcMlTCZZay88RMLZ6apx_rxyovq6GU2f2-Ki2JkbTIRIg41u1lgv46AWHyL8EpOhF21gHPn3OgrEjkclTNNHpk8-N5bQqCWL6RTaNyEJraz6uGKwgIXbiBInbJx_6RwbKWH3Qj_hrG9WX6HmeDyc02JdaN_wUq3UkCOQ1sdBN8dv_8nqZyOC25k58VTXerUas">
+<div class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/95 via-[#F8FAFC]/85 to-[#F8FAFC]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="text-center max-w-3xl mx-auto mb-14">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-blue-800 bg-blue-100 mb-3 border border-blue-200">
+<span class="material-symbols-outlined text-[15px]">school</span>
+          Learn With eFIX AUTO
+        </div>
+<h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight gradient-brand-text">
+          Learn Embedded Systems by Building, Not Just Studying.
+        </h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          We provide practical engineering knowledge and career guidance for students interested in electronics, embedded systems, and VLSI.
+        </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+<!-- 5 Learning Areas -->
+<div class="lg:col-span-6 space-y-3">
+<div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3">
+<div class="p-2 rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+<span class="material-symbols-outlined text-xl">developer_board</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900">1. Microcontroller Hands-On Training</h3>
+<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Registers, timers, interrupts, ADC, and GPIO configuration on real microcontrollers.
+              </p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3">
+<div class="p-2 rounded-xl bg-teal-50 text-teal-600 shrink-0">
+<span class="material-symbols-outlined text-xl">electric_bolt</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900">2. Electronics Fundamentals</h3>
+<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Active &amp; passive components, operational amplifiers, pull-ups, and circuit debugging on breadboards.
+              </p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3">
+<div class="p-2 rounded-xl bg-cyan-50 text-cyan-600 shrink-0">
+<span class="material-symbols-outlined text-xl">memory</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900">3. STM32 / ESP32 / Arduino Learning</h3>
+<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                From simple Arduino sketches to ARM Cortex-M architecture with STM32CubeIDE and FreeRTOS.
+              </p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3">
+<div class="p-2 rounded-xl bg-blue-50 text-blue-600 shrink-0">
+<span class="material-symbols-outlined text-xl">sync_alt</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900">4. UART / SPI / I2C Communication</h3>
+<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Decoding hardware communication waveforms on digital oscilloscopes and protocol analyzers.
+              </p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-start gap-3">
+<div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+<span class="material-symbols-outlined text-xl">work</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900">5. Career Guidance (Electronics, Embedded Systems, VLSI)</h3>
+<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Actionable industry guidance, portfolio building, and bridging academic theory with semiconductor standards.
+              </p>
+</div>
+</div>
+<div class="pt-2">
+<a class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-md transition-all text-sm" href="#contact">
+<span class="material-symbols-outlined text-base">school</span>
+<span class="">Learn With Us</span>
+</a>
+</div>
+</div>
+<!-- Interactive Live Dual-Channel Oscilloscope Simulator -->
+<div class="lg:col-span-6">
+<div class="bg-slate-950 p-5 rounded-2xl border-2 border-slate-800 shadow-2xl text-white">
+<div class="flex items-center justify-between pb-3 border-b border-slate-800">
+<div class="flex items-center gap-2 font-mono text-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="font-bold text-emerald-400">DSO-2026 // DUAL-CHANNEL BENCH</span>
+</div>
+<div class="font-mono text-[11px] text-slate-400">
+                TIMEBASE: 1ms/DIV
+              </div>
+</div>
+<!-- Waveform Canvas Screen -->
+<div class="relative my-4 rounded-xl overflow-hidden border border-slate-800 bg-slate-900/90 h-56 flex items-center justify-center">
+<canvas class="w-full h-full block" height="220" id="oscCanvas" width="560"></canvas>
+<div class="absolute bottom-2 left-3 font-mono text-[10px] text-emerald-400 bg-slate-950/80 px-2 py-0.5 rounded border border-emerald-900">
+                CH1: <span id="ch1FreqDisplay" class="">1000</span> Hz (PWM)
+              </div>
+<div class="absolute bottom-2 right-3 font-mono text-[10px] text-cyan-400 bg-slate-950/80 px-2 py-0.5 rounded border border-cyan-900">
+                CH2: <span id="ch2AmpDisplay" class="">3.3</span>V (Sine)
+              </div>
+</div>
+<!-- Oscilloscope Controls -->
+<div class="space-y-3 font-mono text-xs pt-1">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-emerald-400 font-semibold mb-1" for="freqSlider">CH1 PWM Freq (Hz)</label>
+<input class="w-full accent-emerald-500 cursor-pointer" id="freqSlider" max="3000" min="200" step="50" type="range" value="1000">
+</div>
+<div>
+<label class="block text-cyan-400 font-semibold mb-1" for="dutySlider">CH1 Duty Cycle (%)</label>
+<input class="w-full accent-cyan-500 cursor-pointer" id="dutySlider" max="90" min="10" step="5" type="range" value="50">
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+<span class="">Signal: STM32 Hardware Timer Output</span>
+<span class="text-emerald-400">Simulating Live Probe Waveform</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 09 ABOUT eFIX AUTO / TEAM SECTION -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-white border-b border-slate-200 relative" id="about">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Realistic engineering collective team photograph" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida/AEtjO1Xz4SwAhm5KvA0mPKDoG-De5F0spOVKVGnSWv4Ef9DSiC2_bREKQrJhydrcMlTCZZay88RMLZ6apx_rxyovq6GU2f2-Ki2JkbTIRIg41u1lgv46AWHyL8EpOhF21gHPn3OgrEjkclTNNHpk8-N5bQqCWL6RTaNyEJraz6uGKwgIXbiBInbJx_6RwbKWH3Qj_hrG9WX6HmeDyc02JdaN_wUq3UkCOQ1sdBN8dv_8nqZyOC25k58VTXerUas">
+<div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 space-y-4">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200">
+<span class="material-symbols-outlined text-[15px]">groups</span>
+            About eFIX AUTO
+          </div>
+<h2 class="text-3xl sm:text-4xl font-black tracking-tight gradient-brand-text">
+            Built by Engineers. Driven by Real-World Problems.
+          </h2>
+<!-- Verbatim Text Content -->
+<p class="text-base sm:text-lg text-slate-800 leading-relaxed">
+            eFIX AUTO is an engineering solutions team founded by <strong class="text-slate-900 font-bold">8 Electronics and Communication Engineering graduates</strong>.
+          </p>
+<p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+            With 8+ months of dedicated embedded systems training, practical project experience, and hands-on laboratory work, we design and build functional solutions across hardware, software, and automation.
+          </p>
+<p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+            We believe engineering is about solving problems—not just learning theory.
+          </p>
+<p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+            Every project we build is driven by real needs, practical engineering principles, and a commitment to creating reliable, working solutions.
+          </p>
+<!-- 4 Core Metrics -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+<div class="text-3xl font-black font-mono text-emerald-600">8</div>
+<div class="text-xs font-bold text-slate-800 mt-1">ECE Graduates</div>
+<div class="text-[10px] text-slate-500 font-mono">Core Engineering Team</div>
+</div>
+<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+<div class="text-3xl font-black font-mono text-teal-600">8+ Mo</div>
+<div class="text-xs font-bold text-slate-800 mt-1">Embedded Training</div>
+<div class="text-[10px] text-slate-500 font-mono">Dedicated Lab Sprints</div>
+</div>
+<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+<div class="text-3xl font-black font-mono text-blue-600">100%</div>
+<div class="text-xs font-bold text-slate-800 mt-1">Hands-On Experience</div>
+<div class="text-[10px] text-slate-500 font-mono">Silicon &amp; Hardware</div>
+</div>
+<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+<div class="text-3xl font-black font-mono text-cyan-600">10+</div>
+<div class="text-xs font-bold text-slate-800 mt-1">Prototypes</div>
+<div class="text-[10px] text-slate-500 font-mono">Delivered &amp; Tested</div>
+</div>
+</div>
+<!-- Team Specialization Matrix -->
+<div class="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+<h4 class="text-xs font-mono uppercase font-bold text-slate-500 mb-3 tracking-wider">
+              Specialization Distribution Across 8 ECE Graduates
+            </h4>
+<div class="space-y-2 text-xs font-mono">
+<div class="flex items-center justify-between">
+<span class="text-slate-800 font-medium">Embedded Systems &amp; Firmware:</span>
+<span class="font-bold text-emerald-600">All 8 Team Members</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-full"></div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-slate-800 font-medium">PCB Layout &amp; Hardware Schematics:</span>
+<span class="font-bold text-blue-600">1 Specialist Lead</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-blue-500 h-full w-1/4"></div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-slate-800 font-medium">AI &amp; Computer Vision:</span>
+<span class="font-bold text-cyan-600">2 Specialist Leads</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-cyan-500 h-full w-1/2"></div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-slate-800 font-medium">Client Communication &amp; Scoping:</span>
+<span class="font-bold text-teal-600">4 Active Leads</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-teal-500 h-full w-1/2"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Photography Visual -->
+<div class="lg:col-span-5">
+<div class="relative rounded-2xl overflow-hidden border border-slate-300 shadow-xl">
+<img alt="Realistic engineering collective team photograph" class="w-full h-[460px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCniSZZgYx_K3YaRITW6GjQNDcLvL077f1JWSSXllLUXHFyuWlEWyBnT5AZe2FYPWwK6LU0yXdvjzDgzStvHbOTC1fjGJroc3bzcdPYJbMQ4jY5Ghd9G-XxgLwqvDLPNAPQergYYPsy4KgfJJYkRX1-zAIDmFMnCpwPXUHr8rxnrQNQVGDPgGDHwj1T7dHBPxNZ7fLM-qftYCmFcitkPdzUqIGR31YmE5CjMVUWjpsGnsVbv5vBiUfmvO9ksKqFFyTjEkKb2WuSMwpAov0">
+<div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white font-mono text-xs">
+<div class="text-emerald-400 font-bold flex items-center justify-between mb-1">
+<span class="">eFIX AUTO&nbsp;</span>
+<span class="px-2 py-0.5 rounded bg-emerald-800 text-[10px]">ACTIVE TEAM</span>
+</div>
+<p class="text-slate-300 text-[11px]">Electronics Engineers<br>specelized in embedded system..</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 10 FINAL CTA + CONTACT + FOOTER -->
+<!-- ========================================================================= -->
+<section class="py-20 bg-[#F8FAFC] circuit-dot-bg relative" id="contact">
+<!-- Distinct Background Image + Translucent Soft Overlay -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<img alt="Engineering prototype workbench" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCinGRJDB3c7yTjeGO45cmihV9pOxM0V5Ub1SHliES8ldn2tfDokHdj4DtVbZXeiQF30CimnWvv6piLP-MODyCh5bmqNuvcBexUfyvxtwHRp9z3WFRViU4Ag1vMdEHFoBIQANoBimq3gdWnBpt0f6Hk10K5rIujG_r014fkMaUZC57DWFTmAIuc9KuCVToHciFFZSPRwnpLxmnn5xbIOPWQXwWukh2_gSiALOeadM_MxjvzXYI22Dza4trqW7fiCmjOc2I">
+<div class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/95 via-[#F8FAFC]/85 to-[#F8FAFC]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+<!-- Heading & Pitch -->
+<div class="text-center max-w-3xl mx-auto mb-12">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 mb-3 border border-emerald-200">
+<span class="material-symbols-outlined text-[15px]">send</span>
+          Start Your Project
+        </div>
+<h2 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          Have a Problem? Have an Idea? <br>
+<span class="gradient-brand-text">Let’s Engineer It.</span>
+</h2>
+<p class="mt-3 text-slate-600 text-base sm:text-lg">
+          Tell us about your challenge, idea, or technical requirement. We’ll understand your needs and work toward a practical solution.
+        </p>
+<div class="mt-6 flex flex-wrap items-center justify-center gap-4">
+<a class="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-md transition-all text-sm" href="#contact-form">
+            Discuss Your Idea
+          </a>
+<a class="px-6 py-3 rounded-xl font-bold text-slate-800 bg-white border border-slate-300 hover:bg-slate-50 transition-all text-sm" href="mailto:engineering@efixauto.com">
+            Contact eFIX AUTO
+          </a>
+</div>
+</div>
+<!-- Custom Quotation Policy Note -->
+<div class="max-w-4xl mx-auto mb-10 p-6 rounded-2xl bg-white border border-emerald-200 shadow-sm">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-3xl text-emerald-600 shrink-0">request_quote</span>
+<div>
+<h3 class="text-base font-bold text-slate-900">Custom Engineering Quotation Policy</h3>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed italic">
+              “Every project is different. Tell us about your problem or idea. We’ll understand your requirements, evaluate the technical scope, and provide a custom quotation tailored to your project.”
+            </p>
+</div>
+</div>
+</div>
+<!-- Contact Grid & Form -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 max-w-5xl mx-auto items-start" id="contact-form">
+<!-- Enquiry Form -->
+<div class="lg:col-span-7 bg-white p-8 rounded-2xl border border-slate-200 shadow-tech">
+<form class="space-y-4" onsubmit="event.preventDefault(); alert('Thank you! An eFIX AUTO engineer will review your technical requirements and respond within 24 hours.');">
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="name">Name *</label>
+<input class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="name" placeholder="Your name or title" required="" type="text">
+</div>
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="org">Company / Organization *</label>
+<input class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="org" placeholder="Company, Startup, or Institution" required="" type="text">
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="email">Email *</label>
+<input class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="email" placeholder="name@domain.com" required="" type="email">
+</div>
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="phone">Phone / WhatsApp *</label>
+<input class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="phone" placeholder="+91 94892 01842" required="" type="tel">
+</div>
+</div>
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="problem">What problem are you trying to solve? *</label>
+<textarea class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="problem" placeholder="Describe the operational challenge, manual task, sensor requirements, or prototype you wish to build..." required="" rows="3"></textarea>
+</div>
+<div>
+<label class="block text-xs font-mono font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="specs">Technical Requirements</label>
+<input class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 py-2.5 px-3" id="specs" placeholder="e.g. STM32 preferred, 4-week prototype timeline, 12V supply..." type="text">
+</div>
+<button class="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-tech hover:shadow-tech-hover transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2" type="submit">
+<span class="">Submit Technical Enquiry</span>
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</form>
+</div>
+<!-- Direct Contact Info Options -->
+<div class="lg:col-span-5 space-y-4">
+<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+<h3 class="text-sm font-bold text-slate-900 font-mono uppercase tracking-wide border-b border-slate-100 pb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-lg">contact_phone</span>
+              Direct Engineering Options
+            </h3>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">chat</span>
+</div>
+<div>
+<div class="text-[11px] font-mono text-slate-500 uppercase font-semibold">Direct WhatsApp &amp; Phone</div>
+<div class="text-sm font-bold text-slate-900">+91 6382324458</div>
+<div class="text-xs text-emerald-600 font-medium">Instant technical scoping</div>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">mail</span>
+</div>
+<div>
+<div class="text-[11px] font-mono text-slate-500 uppercase font-semibold">Technical Inquiries Email</div>
+<a class="text-sm font-bold text-slate-900 hover:text-cyan-600" href="mailto:engineering@efixauto.com">engineeringatefixauto.com</a>
+<div class="text-xs text-slate-500">24-hour response turnaround</div>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">location_on</span>
+</div>
+<div>
+<div class="text-[11px] font-mono text-slate-500 uppercase font-semibold">Office &amp; Lab Location</div>
+<div class="text-sm font-bold text-slate-900">eFIX AUTO Hardware Lab</div>
+<div class="text-xs text-slate-500">Electronics &amp; Embedded Prototyping Facility</div>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-100">
+<div class="text-xs font-mono uppercase text-slate-500 mb-2.5 font-bold">Follow Our Technical Releases</div>
+<div class="flex gap-2">
+<a class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-semibold text-slate-700 hover:bg-emerald-600 hover:text-white transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-[14px]">share</span> LinkedIn
+                </a>
+<a class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-semibold text-slate-700 hover:bg-emerald-600 hover:text-white transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> Instagram
+                </a>
+<a class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-semibold text-slate-700 hover:bg-emerald-600 hover:text-white transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-[14px]">code</span> GitHub
+                </a>
+</div>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-900 flex items-center gap-3">
+<span class="material-symbols-outlined text-2xl text-emerald-600 shrink-0">lock</span>
+<div class="">
+<span class="font-bold">100% Confidential IP Guarantee:</span> All client circuit schematics, proprietary firmware, and idea discussions are guarded under strict NDA.
+            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- TECHNICAL FOOTER -->
+<!-- ========================================================================= -->
+<!-- Interactive Scenario Modal -->
+<!-- ========================================================================= -->
+<!-- LARGE CENTERED ENGINEERING SCENARIO MODAL -->
+<!-- ========================================================================= -->
+<div id="scenarioModal" class="fixed inset-0 z-[999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 opacity-0 pointer-events-none transition-all duration-500 overflow-y-auto" onclick="if(event.target === this) closeScenarioModal()">
+  <div id="scenarioModalContent" class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-4xl w-full my-auto overflow-hidden transform scale-95 opacity-0 transition-all duration-500 relative flex flex-col max-h-[90vh]">
+    
+    <!-- Floating Glass Close Button -->
+    <button onclick="closeScenarioModal()" aria-label="Close modal" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-slate-900/75 hover:bg-slate-900 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl">
+      <span class="material-symbols-outlined text-xl">close</span>
+    </button>
+
+    <!-- Scrollable Body Content -->
+    <div class="overflow-y-auto flex-1 custom-scrollbar">
+      
+      <!-- 16:9 Large Hero Image -->
+      <div class="relative w-full aspect-[16/9] max-h-72 sm:max-h-84 overflow-hidden bg-slate-900">
+        <img id="modalHeroImg" src="" alt="Service Architecture" class="w-full h-full object-cover transform scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+        
+        <!-- Badge & Title Overlay -->
+        <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 right-4 sm:right-8 text-white">
+          <div class="flex items-center gap-2 mb-2">
+            <span id="modalIconContainer" class="w-8 h-8 rounded-lg bg-emerald-500/90 text-white flex items-center justify-center backdrop-blur-md shadow-md">
+              <span id="modalIcon" class="material-symbols-outlined text-lg">developer_board</span>
+            </span>
+            <span id="modalBadge" class="text-[11px] font-mono uppercase font-bold px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-emerald-300">
+              Discipline
+            </span>
+          </div>
+          <h2 id="modalTitle" class="text-xl sm:text-3xl font-black text-white tracking-tight leading-tight drop-shadow-md">
+            Service Title
+          </h2>
+        </div>
+      </div>
+
+      <!-- Detailed Content Sections -->
+      <div id="modalBodySections" class="p-6 sm:p-8 space-y-6 sm:space-y-8">
+        
+        <!-- Short & Detailed Description -->
+        <div class="modal-anim-enter">
+          <p id="modalShortDesc" class="text-base sm:text-lg font-bold text-slate-800 leading-snug mb-3"></p>
+          <p id="modalDescription" class="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80"></p>
+        </div>
+
+        <!-- Engineering Capabilities Grid -->
+        <div class="modal-anim-enter">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-emerald-600 text-lg">tune</span>
+            <h4 class="text-xs font-mono uppercase tracking-wider font-bold text-slate-900">Engineering Capabilities</h4>
+          </div>
+          <div id="modalCapabilities" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Tools & Technology Stack -->
+        <div class="modal-anim-enter">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-cyan-600 text-lg">construction</span>
+            <h4 class="text-xs font-mono uppercase tracking-wider font-bold text-slate-900">Tools &amp; Technology Stack</h4>
+          </div>
+          <div id="modalTools" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- What We Deliver & Applications (2-Columns) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 modal-anim-enter">
+          <!-- Deliverables -->
+          <div class="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-3 text-emerald-800">
+                <span class="material-symbols-outlined text-base">verified</span>
+                <h4 class="text-xs font-mono uppercase tracking-wider font-bold">What We Deliver</h4>
+              </div>
+              <ul id="modalDeliverables" class="space-y-2 text-xs sm:text-sm text-slate-700"></ul>
+            </div>
+          </div>
+          <!-- Applications -->
+          <div class="p-5 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-3 text-blue-800">
+                <span class="material-symbols-outlined text-base">rocket_launch</span>
+                <h4 class="text-xs font-mono uppercase tracking-wider font-bold">Applications &amp; Deployments</h4>
+              </div>
+              <ul id="modalApplications" class="space-y-2 text-xs sm:text-sm text-slate-700"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engineering Workflow Pipeline -->
+        <div class="modal-anim-enter">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-slate-700 text-lg">alt_route</span>
+            <h4 class="text-xs font-mono uppercase tracking-wider font-bold text-slate-900">Engineering Workflow</h4>
+          </div>
+          <div id="modalWorkflow" class="flex flex-wrap items-center gap-2 p-4 rounded-2xl bg-slate-900 text-white font-mono text-xs"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sticky Bottom Action Bar -->
+    <div class="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+      <div class="text-xs font-mono text-slate-500 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Validated by 8 ECE Specialists • Strict NDA Protected</span>
+      </div>
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+        <button onclick="closeScenarioModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors">
+          Close
+        </button>
+        <a id="modalDiscussBtn" href="#contact" onclick="closeScenarioModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+          <span>Discuss This Project</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div><footer class="bg-slate-900 text-slate-400 border-t border-slate-800 pt-16 pb-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-12 border-b border-slate-800">
+<!-- Brand and Mission with ORIGINAL LOGO -->
+<div class="lg:col-span-2 space-y-4">
+<a class="inline-block" href="#">
+<img alt="eFIX AUTO Logo" class="h-10 w-auto object-contain brightness-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiFJYH9fNS-fOrAC8TsW9Nxj7oQTSakVVIeD7iFuylj8ne--XfpkfMzqXyge-eGwXKnXWg9vGiO43cxyC1v_uWs43PmichAXoTtJzb4M5EbrLSXhfQ7krKbR7ip7gF7s1CSrvTEkXkUXX-Iiiv-0yBze6Z7J-EA3oubWwp-oVevZziZsVi0dXxGddKExSDhrB-fpbovo8wcEDbTI2uPTvl8wcdSuc0Qj6mi1bpnABn0kr6iKeQdBk1kdAFJgo5KyCR3W8">
+</a>
+<p class="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
+            eFIX AUTO is an engineering solutions team founded by 8 Electronics and Communication Engineering graduates. We convert complex problems into robust embedded, IoT, and AI-enabled hardware solutions.
+          </p>
+<div class="font-mono text-xs text-emerald-400 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Where Electronics Meets Intelligence.
+          </div>
+</div>
+<!-- Services Quick Links -->
+<div class="space-y-3">
+<h4 class="text-xs font-mono uppercase font-bold text-white tracking-wider">Engineering Disciplines</h4>
+<ul class="space-y-2 text-xs">
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">Embedded Systems &amp; Firmware</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">Electronics Engineering</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">KiCad&nbsp; PCB Design</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">AI &amp; Jetson Computer Vision</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">Automation Solutions</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#services">IoT &amp; LoRa Telemetry</a></li>
+</ul>
+</div>
+<!-- Navigation Links -->
+<div class="space-y-3">
+<h4 class="text-xs font-mono uppercase font-bold text-white tracking-wider">Quick Navigation</h4>
+<ul class="space-y-2 text-xs">
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#focus">Our Core Focus</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#why-us">Why Choose Us</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#flagship">Flagship PCB Inspection</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#projects">Engineering Portfolio</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#pipeline">7-Step How We Work</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#about">About 8 ECE Team</a></li>
+</ul>
+</div>
+<!-- Academy & Contact -->
+<div class="space-y-3">
+<h4 class="text-xs font-mono uppercase font-bold text-white tracking-wider">Academy &amp; Support</h4>
+<ul class="space-y-2 text-xs">
+<li class=""><a class="text-emerald-400 font-semibold hover:underline" href="#learn">Learn With eFIX AUTO</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#learn">STM32 / ESP32 Workshops</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#learn">Student Capstone Mentorship</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="#contact">Custom Project Quotation</a></li>
+<li class=""><a class="hover:text-emerald-400 transition-colors" href="mailto:engineering@efixauto.com">engineeringatefixauto.com</a></li>
+</ul>
+</div>
+</div>
+<!-- Bottom Bar with Exact Copyright notice © 2026 eFIX AUTO -->
+<div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+<div class="">
+          © 2026 eFIX AUTO. All Rights Reserved. Practical Embedded &amp; Hardware Engineering Solutions.
+        </div>
+<div class="flex items-center gap-4">
+<span class="">Crafted by 8 ECE Engineers</span>
+<span class="">•</span>
+<span class="">Strict Hardware NDA</span>
+<span class="">•</span>
+<a class="hover:text-emerald-400 transition-colors" href="#">Back to Top ↑</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- ========================================================================= -->
+<!-- DUAL-CHANNEL OSCILLOSCOPE SIMULATOR ENGINE SCRIPT -->
+<!-- ========================================================================= -->
+<script>
+    (function initOscilloscope() {
+      const canvas = document.getElementById('oscCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const freqSlider = document.getElementById('freqSlider');
+      const dutySlider = document.getElementById('dutySlider');
+      const ch1FreqDisplay = document.getElementById('ch1FreqDisplay');
+
+      let time = 0;
+
+      function drawGrid() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.fillStyle = '#060B14';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = '#132035';
+        ctx.lineWidth = 1;
+
+        // Vertical grid lines
+        const xDiv = 10;
+        for (let x = 0; x <= w; x += w / xDiv) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+
+        // Horizontal grid lines
+        const yDiv = 8;
+        for (let y = 0; y <= h; y += h / yDiv) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+
+        // Center reticle
+        ctx.strokeStyle = '#1E3A5F';
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+        ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function renderWaveforms() {
+        const w = canvas.width;
+        const h = canvas.height;
+        drawGrid();
+
+        const freq = freqSlider ? parseFloat(freqSlider.value) : 1000;
+        const duty = dutySlider ? parseFloat(dutySlider.value) / 100 : 0.5;
+
+        if (ch1FreqDisplay) ch1FreqDisplay.innerText = freq;
+
+        // CH1 - Emerald PWM Waveform
+        ctx.strokeStyle = '#10B981';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(16, 185, 129, 0.6)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+
+        const waveScale = freq / 400;
+        const baselineY1 = h * 0.38;
+        const highY1 = baselineY1 - 45;
+
+        for (let x = 0; x < w; x++) {
+          const phase = ((x * waveScale) + time) % 100;
+          const isHigh = phase < (100 * duty);
+          const y = isHigh ? highY1 : baselineY1;
+
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            // square vertical edge
+            const prevPhase = (((x - 1) * waveScale) + time) % 100;
+            const prevIsHigh = prevPhase < (100 * duty);
+            if (prevIsHigh !== isHigh) {
+              ctx.lineTo(x, prevIsHigh ? baselineY1 : highY1);
+            }
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+
+        // CH2 - Cyan Sine Waveform
+        ctx.strokeStyle = '#06B6D4';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+
+        const baselineY2 = h * 0.72;
+        const amplitude2 = 32;
+
+        for (let x = 0; x < w; x++) {
+          const angle = (x * 0.04) + (time * 0.08);
+          const y = baselineY2 + Math.sin(angle) * amplitude2;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Reset shadow
+        ctx.shadowBlur = 0;
+
+        time += 1.2;
+        requestAnimationFrame(renderWaveforms);
+      }
+
+      requestAnimationFrame(renderWaveforms);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+<script>
+  const serviceModalData = {
+    embedded: {
+      title: 'Embedded Systems & Firmware Engineering',
+      shortDesc: 'Design and development of reliable embedded firmware for microcontrollers, connected devices, sensors, and real-time applications.',
+      category: 'Silicon & Firmware Discipline',
+      icon: 'developer_board',
+      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80',
+      detailedContent: 'eFIX AUTO develops embedded systems from low-level firmware to complete hardware bring-up. We work with microcontrollers, sensors, communication interfaces, RTOS environments, and real-time control requirements to turn hardware concepts into working products.',
+      capabilities: [
+        'Bare-metal firmware',
+        'Embedded C / C++',
+        'STM32 / ARM Cortex-M',
+        'ESP32 / FreeRTOS',
+        'GPIO, ADC, PWM, timers',
+        'Interrupt and DMA handling',
+        'UART, SPI, I2C, CAN',
+        'Sensor integration',
+        'Hardware bring-up',
+        'Driver development',
+        'RTOS task-based systems',
+        'Debugging and firmware optimization'
+      ],
+      tools: ['STM32CubeIDE', 'ESP-IDF / FreeRTOS', 'Keil MDK / GCC', 'J-Link & ST-Link Probing', 'Saleae Logic Analyzers', 'Digital Storage Oscilloscopes'],
+      deliverables: [
+        'MCU firmware',
+        'Peripheral drivers',
+        'Sensor interfaces',
+        'Communication modules',
+        'RTOS applications',
+        'Hardware–firmware integration',
+        'Tested prototype firmware'
+      ],
+      applications: [
+        'IoT devices',
+        'Industrial controllers',
+        'Sensor systems',
+        'Automation equipment',
+        'Robotics electronics',
+        'Monitoring systems'
+      ],
+      workflow: ['Requirement Analysis', 'Architecture & Driver Mapping', 'Bare-Metal / RTOS Development', 'Hardware Bring-up', 'Oscilloscope & Logic Probing', 'Optimized Release']
+    },
+    electronics: {
+      title: 'Electronics Engineering',
+      shortDesc: 'Practical analog and digital electronics engineering from circuit concepts to tested hardware.',
+      category: 'Circuit Design & Validation',
+      icon: 'electric_bolt',
+      image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=80',
+      detailedContent: 'We design and validate electronic circuits with a focus on real-world operation, signal integrity, power requirements, component selection, and hardware debugging.',
+      capabilities: [
+        'Analog circuit design',
+        'Digital electronics',
+        'Sensor conditioning',
+        'Signal conditioning',
+        'Power supply stages',
+        'Voltage regulation',
+        'Transistor/MOSFET circuits',
+        'Op-amp circuits',
+        'ADC/DAC interfaces',
+        'Component selection',
+        'Oscilloscope-based debugging',
+        'Multimeter and bench testing'
+      ],
+      tools: ['4-Channel Digital Storage Oscilloscopes', 'Precision Function Generators', 'LDO & DC-DC Buck Regulators', 'SPICE Circuit Simulation', 'Thermal Probing Tools', 'Bench Power Analyzers'],
+      deliverables: [
+        'Circuit architecture',
+        'Schematics',
+        'Component selection',
+        'Prototype circuits',
+        'Hardware testing',
+        'Debugging reports',
+        'Design improvements'
+      ],
+      applications: [
+        'Sensor interfaces',
+        'Embedded hardware',
+        'Industrial electronics',
+        'Power systems',
+        'Automation products',
+        'Educational/research prototypes'
+      ],
+      workflow: ['Schematic Architecture', 'Component Sizing & Simulation', 'Breadboard Verification', 'Signal Integrity Probing', 'Thermal & Power Stress Testing', 'Sign-Off']
+    },
+    pcb: {
+      title: 'PCB Design & Hardware Development',
+      shortDesc: 'Production-oriented PCB design from schematic capture through layout, fabrication, and validation.',
+      category: 'CAD, Layout & Fabrication',
+      icon: 'memory',
+      image: 'https://images.unsplash.com/photo-1517055729445-fa7d27394b48?auto=format&fit=crop&w=1600&q=80',
+      detailedContent: 'eFIX AUTO converts tested circuit concepts into practical PCB designs. Our approach considers component placement, routing, power distribution, signal integrity, manufacturability, and debugging accessibility.',
+      capabilities: [
+        'Schematic capture',
+        'PCB layout',
+        'Multi-layer PCB',
+        'High-speed routing',
+        'Power routing',
+        'Grounding strategy',
+        'Signal integrity',
+        'EMI/EMC considerations',
+        'DFM / DFA',
+        'Footprint creation',
+        'Design-rule checking',
+        'Gerber generation'
+      ],
+      tools: ['KiCad 8', 'Altium Designer', '4-Layer & Multi-Layer Stackups', 'Gerber & Excellon Drill Export', 'IPC-A-610 Class 2/3 Guidelines', 'SMT Stencil Workflows'],
+      deliverables: [
+        'Complete schematic',
+        'PCB layout',
+        'Component footprints',
+        'Gerber files',
+        'BOM (Bill of Materials)',
+        'Manufacturing files',
+        'Prototype-ready PCB'
+      ],
+      applications: [
+        'Embedded controllers',
+        'IoT boards',
+        'Sensor boards',
+        'Power electronics',
+        'Industrial electronics',
+        'Custom development boards'
+      ],
+      workflow: ['Schematic Capture', 'Stackup & Constraint Setup', 'Component Placement', 'Differential & Power Routing', 'DFM / DRC Audit', 'Gerber & Fabrication Release']
+    },
+    aivision: {
+      title: 'AI & Computer Vision',
+      shortDesc: 'Edge AI and computer-vision solutions for inspection, detection, classification, and intelligent automation.',
+      category: '★ Flagship Capability / Edge AI',
+      icon: 'visibility',
+      image: 'C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369870039.jpg',
+      detailedContent: 'We integrate AI with real-world hardware to solve practical inspection and automation problems. The focus is not only on the AI model but on the complete edge pipeline—from camera acquisition to processing and machine response.',
+      capabilities: [
+        'Object detection',
+        'Image classification',
+        'Defect detection',
+        'Visual inspection',
+        'Image processing',
+        'Real-time inference',
+        'Camera integration',
+        'Edge AI',
+        'Automated sorting',
+        'AI-assisted monitoring'
+      ],
+      tools: ['NVIDIA Jetson Orin Nano / Xavier', 'OpenCV & NumPy', 'TensorFlow & TensorRT', 'Industrial GigE Telecentric Optics', 'Python / C++ Inference Pipelines', 'Edge Computing Hardware'],
+      deliverables: [
+        'Vision prototype',
+        'Detection pipeline',
+        'Inspection system',
+        'AI inference application',
+        'Camera integration',
+        'Real-time visualization',
+        'Hardware–AI integration'
+      ],
+      applications: [
+        'Industrial inspection',
+        'Defect detection',
+        'Automated sorting',
+        'Product quality checking',
+        'Object recognition',
+        'Machine monitoring'
+      ],
+      workflow: ['Optical Rig & Lighting Calibration', 'Dataset Acquisition & Labeling', 'Model Training / CNN Optimization', 'Jetson TensorRT Deployment', 'Low-Latency Closed Loop']
+    },
+    iot: {
+      title: 'IoT & Connected Systems',
+      shortDesc: 'Connected embedded systems that collect, communicate, monitor, and visualize real-world data.',
+      category: 'Telemetry & Wireless Networks',
+      icon: 'cell_tower',
+      image: 'C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369907477.jpg',
+      detailedContent: 'We build IoT solutions by connecting sensors and embedded devices to communication networks and monitoring platforms. The system is designed from the physical sensor layer through device communication and application-level data.',
+      capabilities: [
+        'Sensor data acquisition',
+        'ESP32-based IoT',
+        'Wi-Fi connectivity',
+        'Bluetooth/BLE',
+        'UART/SPI/I2C integration',
+        'Device communication',
+        'Remote monitoring',
+        'Data logging',
+        'Cloud/API integration',
+        'Real-time dashboards'
+      ],
+      tools: ['ESP32-WROOM & ESP32-S3', 'SX1276 LoRa RF Transceivers', 'MQTT & WebSocket Brokers', 'HTTP REST / Webhook APIs', 'Low-Power DeepSleep Modes', 'Live Telemetry Dashboards'],
+      deliverables: [
+        'IoT prototype',
+        'Sensor node',
+        'Connected controller',
+        'Communication firmware',
+        'Data monitoring system',
+        'Device-to-platform integration'
+      ],
+      applications: [
+        'Industrial monitoring',
+        'Environmental monitoring',
+        'Smart devices',
+        'Machine monitoring',
+        'Energy monitoring',
+        'Remote sensor systems'
+      ],
+      workflow: ['Sensor Node Architecture', 'Low-Power Protocol Setup (MQTT/LoRa/BLE)', 'Edge Data Buffering', 'Cloud Bridge / Gateway Integration', 'Real-Time Web Telemetry']
+    },
+    automation: {
+      title: 'Automation & Control Systems',
+      shortDesc: 'Embedded control and automation solutions that connect sensors, controllers, actuators, and machines.',
+      category: 'Industrial Mechatronics',
+      icon: 'smart_toy',
+      image: 'C:/Users/sabarishclean/.gemini/antigravity-ide/brain/92be5269-eb3c-4b44-a4ab-c3e62a83fe00/.user_uploaded/media_1789369870055.jpg',
+      detailedContent: 'eFIX AUTO develops practical automation systems for controlling physical processes. We combine electronics, embedded firmware, sensors, actuators, and control logic into reliable working prototypes.',
+      capabilities: [
+        'Sensor-based control',
+        'Motor control',
+        'Relay control',
+        'PWM control',
+        'Actuator interfaces',
+        'State-machine design',
+        'Automatic sequencing',
+        'Safety interlocks',
+        'Industrial communication',
+        'Real-time control',
+        'Machine monitoring'
+      ],
+      tools: ['Opto-Isolated Industrial Relays', 'NEMA Stepper & Servo Controls', 'Closed-Loop PID Regulation', 'Optical & Inductive Proximity Gates', 'Emergency Stop Interlocks', 'Assembly Line Rigs'],
+      deliverables: [
+        'Control architecture',
+        'Embedded controller',
+        'Automation prototype',
+        'Control firmware',
+        'Sensor/actuator integration',
+        'Machine interface',
+        'Tested automation logic'
+      ],
+      applications: [
+        'Industrial machines',
+        'Motorized systems',
+        'Process automation',
+        'Smart equipment',
+        'Robotics',
+        'Production systems'
+      ],
+      workflow: ['Mechanical / Actuator Requirements', 'Control Logic & State Machine Architecture', 'Opto-Isolation & Driver Power Stage', 'Real-Time Feedback Calibration', 'Rig Safety Validation']
+    },
+    prototyping: {
+      title: 'Rapid Prototyping & Product Development',
+      shortDesc: 'Move engineering ideas quickly from concept to functional prototype.',
+      category: 'Turnkey PoC & Engineering',
+      icon: 'build_circle',
+      image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1600&q=80',
+      detailedContent: 'When an idea exists only as a concept, eFIX AUTO helps turn it into something that can be tested physically. We combine electronics, embedded systems, PCB design, mechanical considerations, and software to create functional engineering prototypes.',
+      capabilities: [
+        'Requirement analysis',
+        'System architecture',
+        'Component selection',
+        'Proof-of-concept development',
+        'Breadboard prototyping',
+        'Development-board integration',
+        'Sensor integration',
+        'Firmware development',
+        'PCB prototype',
+        'Functional testing',
+        'Iterative debugging'
+      ],
+      tools: ['Quick-Turn CNC / PCB Milling', 'SMD Hot-Air Rework Stations', 'Modular Sensor Breadboards', 'Bench Bring-up Analyzers', 'Precision Calipers & Custom Brackets', 'Iterative Test Rigs'],
+      deliverables: [
+        'Proof of concept',
+        'Functional prototype',
+        'Engineering BOM',
+        'Circuit design',
+        'Firmware',
+        'PCB prototype',
+        'Test results',
+        'Documentation'
+      ],
+      applications: [
+        'Startup products',
+        'Student projects',
+        'Industrial concepts',
+        'IoT products',
+        'Embedded devices',
+        'Research prototypes'
+      ],
+      workflow: ['Idea', 'Requirements', 'Architecture', 'Prototype', 'Test', 'Debug', 'Improve', 'Working Prototype']
+    },
+    guidance: {
+      title: 'Engineering Guidance & Student Projects',
+      shortDesc: 'Practical engineering guidance for students, innovators, and early-stage project teams.',
+      category: 'Academy, Mentorship & VLSI',
+      icon: 'school',
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80',
+      detailedContent: 'eFIX AUTO helps students and early-stage innovators understand how to build projects properly—not simply provide a finished output. We guide the complete engineering process from problem definition and component selection to implementation, debugging, documentation, and demonstration.',
+      capabilities: [
+        'Project idea validation',
+        'Requirement definition',
+        'Block-diagram development',
+        'Component selection',
+        'Circuit explanation',
+        'Embedded C guidance',
+        'Microcontroller selection',
+        'Sensor integration',
+        'PCB guidance',
+        'Firmware debugging',
+        'Testing methodology',
+        'Project documentation',
+        'Demo preparation',
+        'Technical presentation guidance'
+      ],
+      tools: ['Live Oscilloscope Probing Labs', 'Register-Level Driver Tutorials', 'KiCad Schematic Reviews', 'Technical Paper & Report Formatting', 'Viva / Interview Prep Mock Sessions', 'VLSI Roadmap Consultation'],
+      deliverables: [
+        'Project architecture',
+        'Hardware guidance',
+        'Firmware guidance',
+        'Debugging support',
+        'Testing methodology',
+        'Documentation',
+        'Viva/interview preparation',
+        'Technical mentoring'
+      ],
+      applications: [
+        'Engineering projects',
+        'Final-year projects',
+        'Embedded projects',
+        'IoT projects',
+        'Electronics projects',
+        'AI/vision prototypes',
+        'Research concepts'
+      ],
+      workflow: ['Idea & Feasibility Review', 'System Block Diagram & Architecture', 'Hands-on Firmware & Probing Support', 'Rig Debugging & Validation', 'Presentation & Viva Mastery']
+    }
+  };
+
+  let activeCardElement = null;
+
+  function openScenarioModal(key, cardEl) {
+    const data = serviceModalData[key];
+    if (!data) return;
+
+    // Remove any previous active card state
+    if (activeCardElement) {
+      activeCardElement.classList.remove('service-card-active');
+    }
+    activeCardElement = cardEl || null;
+    if (activeCardElement) {
+      activeCardElement.classList.add('service-card-active');
+    }
+
+    // Populate Hero & Header
+    const heroImg = document.getElementById('modalHeroImg');
+    if (heroImg) {
+      heroImg.src = data.image;
+      heroImg.alt = data.title;
+    }
+    document.getElementById('modalTitle').textContent = data.title;
+    document.getElementById('modalShortDesc').textContent = data.shortDesc;
+    document.getElementById('modalBadge').textContent = data.category;
+    document.getElementById('modalIcon').textContent = data.icon;
+    document.getElementById('modalDescription').textContent = data.detailedContent;
+
+    // Capabilities Grid
+    const capContainer = document.getElementById('modalCapabilities');
+    if (capContainer) {
+      capContainer.innerHTML = data.capabilities.map(cap => `
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-800">
+          <span class="material-symbols-outlined text-emerald-600 text-sm shrink-0">check_circle</span>
+          <span class="truncate">${cap}</span>
+        </div>
+      `).join('');
+    }
+
+    // Tools & Tech Stack
+    const toolsContainer = document.getElementById('modalTools');
+    if (toolsContainer) {
+      toolsContainer.innerHTML = data.tools.map(tool => `
+        <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 text-[11px] font-mono font-semibold">
+          ${tool}
+        </span>
+      `).join('');
+    }
+
+    // Deliverables List
+    const delivContainer = document.getElementById('modalDeliverables');
+    if (delivContainer) {
+      delivContainer.innerHTML = data.deliverables.map(del => `
+        <li class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-base shrink-0">task_alt</span>
+          <span>${del}</span>
+        </li>
+      `).join('');
+    }
+
+    // Applications List
+    const appContainer = document.getElementById('modalApplications');
+    if (appContainer) {
+      appContainer.innerHTML = data.applications.map(app => `
+        <li class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-blue-600 text-base shrink-0">arrow_right</span>
+          <span>${app}</span>
+        </li>
+      `).join('');
+    }
+
+    // Workflow Pipeline
+    const wfContainer = document.getElementById('modalWorkflow');
+    if (wfContainer) {
+      wfContainer.innerHTML = data.workflow.map((step, idx) => `
+        <div class="flex items-center gap-1.5">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-emerald-400 font-semibold border border-slate-700">${idx + 1}. ${step}</span>
+          ${idx < data.workflow.length - 1 ? '<span class="text-slate-500 font-bold px-0.5">→</span>' : ''}
+        </div>
+      `).join('');
+    }
+
+    // Configure CTA
+    const discussBtn = document.getElementById('modalDiscussBtn');
+    if (discussBtn) {
+      discussBtn.href = '#contact';
+      discussBtn.onclick = function() {
+        closeScenarioModal();
+        const msgField = document.querySelector('textarea[placeholder*="project"], textarea[name="message"]');
+        if (msgField) {
+          msgField.value = `Hello eFIX AUTO team, I would like to discuss our requirements regarding ${data.title}.`;
+          msgField.focus();
+        }
+      };
+    }
+
+    // Trigger Smooth Card → Modal Expansion Animation
+    const modal = document.getElementById('scenarioModal');
+    const modalContent = document.getElementById('scenarioModalContent');
+
+    document.body.style.overflow = 'hidden';
+    modal.classList.remove('pointer-events-none', 'opacity-0');
+    modal.classList.add('opacity-100');
+
+    setTimeout(() => {
+      modalContent.classList.remove('scale-95', 'opacity-0');
+      modalContent.classList.add('scale-100', 'opacity-100');
+      if (heroImg) {
+        heroImg.classList.remove('scale-105');
+        heroImg.classList.add('scale-100');
+      }
+
+      // Stagger in content sections
+      const animSections = document.querySelectorAll('.modal-anim-enter');
+      animSections.forEach((sec, i) => {
+        setTimeout(() => sec.classList.add('modal-anim-enter-active'), 60 + i * 40);
+      });
+    }, 20);
+  }
+
+  function closeScenarioModal() {
+    const modal = document.getElementById('scenarioModal');
+    const modalContent = document.getElementById('scenarioModalContent');
+    const heroImg = document.getElementById('modalHeroImg');
+
+    if (!modal) return;
+
+    modalContent.classList.remove('scale-100', 'opacity-100');
+    modalContent.classList.add('scale-95', 'opacity-0');
+    if (heroImg) {
+      heroImg.classList.remove('scale-100');
+      heroImg.classList.add('scale-105');
+    }
+
+    const animSections = document.querySelectorAll('.modal-anim-enter');
+    animSections.forEach(sec => sec.classList.remove('modal-anim-enter-active'));
+
+    setTimeout(() => {
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      document.body.style.overflow = '';
+      if (activeCardElement) {
+        activeCardElement.classList.remove('service-card-active');
+        activeCardElement = null;
+      }
+    }, 250);
+  }
+
+  // Keyboard shortcut: ESC to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeScenarioModal();
+  });
+</script>
+
+<!-- ========================================================================= -->
+<!-- INTRO GEAR ANIMATION LAYER -->
+<!-- ========================================================================= -->
+<div id="introGearLayer" class="fixed inset-0 pointer-events-none z-[100] overflow-hidden" aria-hidden="true">
+  <div id="introGearMover" style="position: fixed; top: 0; left: 0; will-change: transform, opacity; opacity: 0; transform: translate3d(0, 0, 0);">
+    <!-- Particle trail aura -->
+    <div id="introGearTrail" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 9999px; background: radial-gradient(circle, rgba(6,182,212,0.35) 0%, rgba(37,99,235,0.15) 50%, transparent 75%); filter: blur(4px); pointer-events: none;"></div>
+    
+    <!-- Rotating Gear Element -->
+    <div id="introGearRotator" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; will-change: transform;">
+      <svg viewBox="-50 -50 100 100" class="w-full h-full" style="filter: drop-shadow(0 0 8px rgba(6,182,212,0.8)) drop-shadow(0 0 18px rgba(37,99,235,0.5));">
+        <defs>
+          <linearGradient id="efixGearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06B6D4"/>
+            <stop offset="50%" stop-color="#0284C7"/>
+            <stop offset="100%" stop-color="#2563EB"/>
+          </linearGradient>
+          <radialGradient id="efixGearGlowAura" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.85"/>
+            <stop offset="65%" stop-color="#0284C7" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Motion glow aura disc -->
+        <circle cx="0" cy="0" r="48" fill="url(#efixGearGlowAura)" opacity="0.8" />
+        <!-- Gear body with 8 precision teeth -->
+        <g fill="url(#efixGearGradient)">
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(45)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(90)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(135)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(180)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(225)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(270)" />
+          <rect x="-6.5" y="-46" width="13" height="13" rx="2.5" transform="rotate(315)" />
+          <!-- Main gear ring with central aperture -->
+          <path fill-rule="evenodd" d="M 0 -38 A 38 38 0 1 1 0 38 A 38 38 0 1 1 0 -38 M 0 -17 A 17 17 0 1 0 0 17 A 17 17 0 1 0 0 -17 Z" />
+        </g>
+        <!-- Metallic Inner Accents -->
+        <circle cx="0" cy="0" r="24" fill="none" stroke="#67E8F9" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.85" />
+        <circle cx="0" cy="0" r="17" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity="0.95" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- SMOOTH HALF-U GEAR ANIMATION ENGINE -->
+<!-- ========================================================================= -->
+<script>
+  (function initGearIntroAnimation() {
+    const mover = document.getElementById('introGearMover');
+    const rotator = document.getElementById('introGearRotator');
+    const trail = document.getElementById('introGearTrail');
+    const logoImg = document.getElementById('headerLogoImg');
+    const dockPulse = document.getElementById('logoDockPulse');
+    const logoLink = document.getElementById('headerLogoLink');
+
+    if (!mover || !rotator || !logoImg) return;
+
+    let animationRunning = false;
+
+    // Smooth cubic bezier easing function
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    // Get exact target coordinates of the 'O' gear inside the eFIX AUTO logo
+    function getTargetGearCoordinates() {
+      const rect = logoImg.getBoundingClientRect();
+      // The 'O' gear in AUTO is at approx 93% width and centered vertically
+      const gearCenterX = rect.left + (rect.width * 0.932);
+      const gearCenterY = rect.top + (rect.height * 0.52);
+      const gearDiameter = Math.max(22, rect.height * 0.58);
+      return { x: gearCenterX, y: gearCenterY, size: gearDiameter };
+    }
+
+    function runAnimation() {
+      if (animationRunning) return;
+      animationRunning = true;
+
+      // Start position: top-right corner of the window
+      const startX = window.innerWidth - 60;
+      const startY = 70;
+
+      // Target position
+      const target = getTargetGearCoordinates();
+
+      // Control Point for smooth Half-U arc (swoops downward across the viewport)
+      const ctrlX = target.x + (startX - target.x) * 0.48;
+      const ctrlY = Math.min(window.innerHeight * 0.50, Math.max(300, target.y + 260));
+
+      const duration = 2600; // ms
+      let startTime = null;
+
+      // Set base size to target size
+      rotator.style.width = target.size + 'px';
+      rotator.style.height = target.size + 'px';
+
+      mover.style.opacity = '1';
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const linearProgress = Math.min(1, elapsed / duration);
+
+        // Smoothly eased motion progress
+        const p = easeInOutQuad(linearProgress);
+
+        // Update target coordinates dynamically in case of header/viewport adjustments
+        const liveTarget = getTargetGearCoordinates();
+        const p0 = { x: startX, y: startY };
+        const p1 = { x: ctrlX, y: ctrlY };
+        const p2 = { x: liveTarget.x, y: liveTarget.y };
+
+        // Quadratic Bezier Formula for half-U curve
+        const invP = 1 - p;
+        const currentX = (invP * invP * p0.x) + (2 * invP * p * p1.x) + (p * p * p2.x);
+        const currentY = (invP * invP * p0.y) + (2 * invP * p * p1.y) + (p * p * p2.y);
+
+        // Scale: Starts oversized (2.4x), stays oversized (>2.0x) during flight, then scales down smoothly to 1.0x
+        let currentScale = 1.0;
+        if (linearProgress < 0.45) {
+          // Gently ease from 2.4 to 2.15
+          currentScale = 2.4 - (linearProgress / 0.45) * 0.25;
+        } else {
+          // Scale down from 2.15 to exact 1.0
+          const scaleProg = (linearProgress - 0.45) / 0.55;
+          const easedScaleProg = easeOutCubic(scaleProg);
+          currentScale = 2.15 - (easedScaleProg * 1.15);
+        }
+
+        // Rotation: 3 full revolutions (1080 deg), smoothly decelerates to 0 deg alignment
+        const rotationAngle = (easeInOutQuad(linearProgress) * 1080) % 360;
+
+        // Position the gear centered on (currentX, currentY)
+        const halfSize = target.size / 2;
+        mover.style.transform = `translate3d(${currentX - halfSize}px, ${currentY - halfSize}px, 0)`;
+        rotator.style.transform = `scale(${currentScale}) rotate(${rotationAngle}deg)`;
+
+        // Trail fade
+        if (trail) {
+          trail.style.opacity = (1 - (linearProgress * 0.8)).toString();
+          trail.style.transform = `translate(-50%, -50%) scale(${currentScale * 1.3})`;
+        }
+
+        if (linearProgress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          // Reached destination: Snap into seamless integration
+          mover.style.transform = `translate3d(${liveTarget.x - halfSize}px, ${liveTarget.y - halfSize}px, 0)`;
+          rotator.style.transform = `scale(1) rotate(0deg)`;
+
+          // Trigger docking pulse effect
+          if (dockPulse) {
+            dockPulse.style.width = (liveTarget.size * 1.4) + 'px';
+            dockPulse.style.height = (liveTarget.size * 1.4) + 'px';
+            dockPulse.classList.remove('docking-ripple');
+            // Force reflow
+            void dockPulse.offsetWidth;
+            dockPulse.classList.add('docking-ripple');
+          }
+
+          // Softly fade floating gear into logo
+          setTimeout(() => {
+            mover.style.transition = 'opacity 0.6s ease-out';
+            mover.style.opacity = '0';
+            if (logoImg) {
+              logoImg.classList.add('logo-active-glow');
+              setTimeout(() => logoImg.classList.remove('logo-active-glow'), 3000);
+            }
+            setTimeout(() => {
+              animationRunning = false;
+              mover.style.transition = '';
+            }, 650);
+          }, 350);
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    // Launch animation when window is ready
+    if (document.readyState === 'complete') {
+      setTimeout(runAnimation, 250);
+    } else {
+      window.addEventListener('load', () => setTimeout(runAnimation, 250));
+    }
+
+    // Replay on logo click
+    if (logoLink) {
+      logoLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        runAnimation();
+      });
+    }
+  })();
+</script>
+
+</body></html>
